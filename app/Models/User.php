@@ -9,6 +9,11 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
+
+use Filament\Panel;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasAvatar;
 
 #[Fillable([
     'name',
@@ -20,10 +25,16 @@ use Illuminate\Notifications\Notifiable;
     'photo_path',
 ])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser, HasAvatar
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    // Autorisasi user agar dapat login ke Filament Panel
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->is_staff;
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -37,5 +48,19 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_staff' => 'boolean',
         ];
+    }
+
+    // user avatar url
+    public function getFilamentAvatarUrl(): ?string
+    {
+        // cek apakah user punya foto tersimpan
+        if (
+            $this->photo_path &&
+            Storage::disk('public')->exists($this->photo_path)
+        ) {
+            // return url foto
+            return Storage::disk('public')->url($this->photo_path);
+        }
+        return null;
     }
 }
