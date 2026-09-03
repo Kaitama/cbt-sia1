@@ -10,7 +10,7 @@ use Override;
 class Answer extends Model
 {
     // trait
-    use SoftDeletes;
+    // use SoftDeletes;
 
     protected $guarded = [];
 
