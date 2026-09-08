@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Filament\Panel;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable([
     'name',
@@ -62,5 +63,11 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
             return Storage::disk('public')->url($this->photo_path);
         }
         return null;
+    }
+
+    // relasi ke tabel students
+    public function student(): HasOne
+    {
+        return $this->hasOne(Student::class);
     }
 }
