@@ -3,8 +3,10 @@
 namespace App\Filament\Test\Resources\Exams;
 
 use App\Filament\Test\Resources\Exams\Pages\ManageExams;
+use App\Filament\Test\Resources\Exams\Pages\StartingExam;
 use App\Models\Exam;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -56,43 +58,36 @@ class ExamResource extends Resource
             ->recordTitleAttribute('title')
             ->columns([
                 TextColumn::make('title')
+                    ->label('Ujian')
                     ->searchable(),
                 TextColumn::make('duration')
+                    ->label('Durasi')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('threshold')
+                    ->label('Min. Score')
                     ->numeric()
                     ->sortable(),
-                IconColumn::make('exact_time')
-                    ->boolean(),
                 TextColumn::make('started_at')
-                    ->dateTime()
+                    ->label('Mulai')
+                    ->dateTime('d F Y, H:i:s')
                     ->sortable(),
-                TextColumn::make('expired_at')
-                    ->dateTime()
-                    ->sortable(),
-                IconColumn::make('is_available')
-                    ->boolean(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                //
             ])
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
+                Action::make('start')
+                    ->label('Mulai ujian')
+                    ->icon(Heroicon::OutlinedPaperAirplane)
+                    ->color('primary')
+                    ->button()
+                    ->disabled(fn ($record) =>
+                        $record->started_at >= now()
+                    )
+                    ->url(fn ($record) =>
+                        route(
+                            StartingExam::getRouteName(),
+                            ['exam' => $record]
+                        )
+                    ),
             ]);
     }
 
@@ -100,6 +95,7 @@ class ExamResource extends Resource
     {
         return [
             'index' => ManageExams::route('/'),
+            'mulai' => StartingExam::route('/{exam}/mulai')
         ];
     }
 }

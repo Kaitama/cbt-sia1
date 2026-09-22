@@ -10,10 +10,4 @@ class ManageExams extends ManageRecords
 {
     protected static string $resource = ExamResource::class;
 
-    protected function getHeaderActions(): array
-    {
-        return [
-            CreateAction::make(),
-        ];
-    }
 }
