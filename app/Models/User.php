@@ -34,7 +34,15 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     // Autorisasi user agar dapat login ke Filament Panel
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->is_staff;
+        if ($panel->getId() === 'admin') {
+            return $this->is_staff;
+        }
+
+        if ($panel->getId() === 'test') {
+            return !$this->is_staff;
+        }
+
+        return false;
     }
 
     /**
